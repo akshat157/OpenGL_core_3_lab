@@ -1,5 +1,3 @@
-'gswin32c.exe' は、内部コマンドまたは外部コマンド、
-操作可能なプログラムまたはバッチ ファイルとして認識されていません。
 warning: Tag `SYMBOL_CACHE_SIZE' at line 333 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
 warning: Tag `SHOW_DIRECTORIES' at line 542 of file `-' has become obsolete.
@@ -13,23 +11,26 @@ warning: Tag `XML_SCHEMA' at line 1421 of file `-' has become obsolete.
 warning: Tag `XML_DTD' at line 1427 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
 warning: the dot tool could not be found at /usr/local/bin/
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/rendersystem/renderer.EN.cpp:31: warning: missing title after \defgroup RendererGlobalFunctions
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/rendersystem/renderer.FR.cpp:30: warning: missing title after \defgroup RendererGlobalFunctions
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab1.h:62: warning: image file /shot_TP1_Partie1.png is not found in IMAGE_PATH: assuming external image.
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab1.h:68: warning: image file shot_TP1_Partie2.png is not found in IMAGE_PATH: assuming external image.
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:14: warning: lonely <li> tag found
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:15: warning: lonely <li> tag found
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:16: warning: lonely <li> tag found
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/objloader.h:82: warning: The following parameters of Loaders::Obj_mtl::ObjLoader::load(const QString &filename, QString &reason) are not documented:
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/rendersystem/renderer.EN.cpp:32: warning: missing title after \defgroup RendererGlobalFunctions
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/rendersystem/renderer.FR.cpp:30: warning: missing title after \defgroup RendererGlobalFunctions
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab1.h:62: warning: image file /shot_TP1_Partie1.png is not found in IMAGE_PATH: assuming external image.
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab1.h:68: warning: image file shot_TP1_Partie2.png is not found in IMAGE_PATH: assuming external image.
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:14: warning: lonely <li> tag found
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:15: warning: lonely <li> tag found
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/00_INSTRUCTIONS/lab_instructions/lab2.h:16: warning: lonely <li> tag found
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/objloader.h:82: warning: The following parameters of Loaders::Obj_mtl::ObjLoader::load(const QString &filename, QString &reason) are not documented:
   parameter 'filename'
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
-C:/my_repos/git_silenthell/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
-error: Problem running ghostscript gswin32c.exe -q -g66x50 -r384x384x -sDEVICE=ppmraw -sOutputFile=_form0.pnm -dNOPAUSE -dBATCH -- _form0.ps. Check your installation!
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:118: warning: explicit link request to 'Vertex' could not be resolved
+/media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/fileloaders/mesh.h:121: warning: explicit link request to 'TriangleIndex' could not be resolved
+sh: 1: latex: not found
+error: Problems running latex. Check your installation or look for typos in _formulas.tex and check _formulas.log!
+sh: 1: dvips: not found
+error: Problems running dvips. Check your installation!

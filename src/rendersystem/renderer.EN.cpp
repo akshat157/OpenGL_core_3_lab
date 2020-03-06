@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "renderer.h"
 
 #include "gl_utils/opengl.h"
@@ -66,10 +67,12 @@ void Renderer::initRessources()
     // N.B (2): Every OpenGl "state" can be disabled with glDisable()
 
     // ...
+    glEnable(GL_DEPTH_TEST);
 
     // 2 - Define the drawing mode (Wires or Plain "glPolygonMode()")
 
     // ...
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
@@ -89,7 +92,6 @@ void Renderer::initView()
 
 
     // Initialize the view matrix ('this->mViewMatrix' attribute)
-
     // Use the following values:
     // Eye position (eye): 1.f, 0.f, 0.f
     // Aimed point (center): 0.0f, 0.0f, 0.0f
@@ -98,6 +100,7 @@ void Renderer::initView()
     // To fill "mViewMatrix" you can use
     // "glm::lookAt()" which helps to compute the view matrix
 
+    this->mViewMatrix = glm::lookAt(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
@@ -202,15 +205,32 @@ void Renderer::initShaders()
     //   2.1 - Load the source code from the file "../shaders/fragmentdefault.glsl"
     //         you will use the function "loaders::text::loadFile()" which reads text files.
     //         Also use the attribute "mFragmentShaderId"
+    char* fragmentShaderSource = Loaders::Text::loadFile("../shaders/fragmentdefault.glsl");
+
     //   2.2 - Allocate the OpenGl object called FRAGMENT_SHADER and associate it to the source code
+    glAssert(mFragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER));
+    glAssert(glShaderSource(mFragmentShaderId, 1, (const GLchar**)&fragmentShaderSource, NULL));
+
     //   2.3 - Compile the shader
+    glAssert(glCompileShader(mFragmentShaderId));
+
     //   2.4 - Check compilation errors
 
+    //   GLint compiled; Redeclaration not required.
+
+    glAssert(glGetShaderiv(mFragmentShaderId, GL_COMPILE_STATUS, &compiled));
+    if (!compiled) {
+        // Print error message
+        std::cerr << " Fragment shader not compiled : " << std::endl;
+        printShaderInfoLog(mFragmentShaderId); // <- tool defined within this project
+    }
 
     // 3 - Program :
     //   3.1 - Allocate the OpenGl "program", store its identifier in the attribute "mProgram"
     // and associate the vertex shader and fragment shader (glCreateProgramm() glAttachShader() )
-
+    glAssert(mProgram = glCreateProgram());
+    glAssert(glAttachShader(mProgram, mVertexShaderId));
+    glAssert(glAttachShader(mProgram, mFragmentShaderId));
 
     //   3.2 - Define the index corresponding to "vertex attributes"
     // ("vertex attributes" are defined in the vertex shader "vertexdefault.glsl"
@@ -236,14 +256,23 @@ void Renderer::initShaders()
     // those numbers (PART II of lab 1).
 
     // ...
+    glAssert(glBindAttribLocation(mProgram, 0, (GLchar*)"inPosition"));
+    glAssert(glBindAttribLocation(mProgram, 1, (GLchar*)"inNormal"));
+    glAssert(glBindAttribLocation(mProgram, 2, (GLchar*)"inTexCoord"));
 
     //   3.3 - Link the program (i.e. Link vertex shader and fragment shader)
     //         ( glLinkProgram() )
+    glLinkProgram(mProgram);
 
     //   3.4 - Check linking errors
     //          (use glGetProgramiv() then printProgramInfoLog())
-
-
+    GLint linked;
+    glAssert(glGetProgramiv(mProgram, GL_LINK_STATUS, &linked));
+    if (!linked) {
+        // Print error message
+        std::cerr << " Program not linked : " << std::endl;
+        printShaderInfoLog(mProgram); // <- tool defined within this project
+    }
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
 }
@@ -273,131 +302,6 @@ void Renderer::clearShaders()
     // #########################################################################
 }
 
-//------------------------------------------------------------------------------
-
-/// "Render loop": this function is automatically called every time every time the
-/// screen/window is refreshed
-void Renderer::render()
-{
-    // We declare the 4x4 matrix to transform object of the scene,
-    // the so called "model matrix":
-    // For this lab no animation so we use the indentity matrix.
-    // The constructor glm::mat4x4(float) set the diagonal values therefore:
-    const glm::mat4x4 modelMatrix(1.0f);
-    // Is the identiry matrix:
-    // 1 0 0 0
-    // 0 1 0 0
-    // 0 0 1 0
-    // 0 0 0 1
-
-    // #########################################################################
-    // LAB 1 / PART I: CODE TO COMPLETE
-
-
-    // This is the main function to render/compute the image
-    // We must call the openGL API functions (very low level) to command the GPU
-    // to draw our scene correctly using rasterization .
-
-
-    // 1 - Prepare our image for rendering: Remember this actually a look
-    //     and this function gets called over and over again so we must erase
-    //     previous drawings and start fresh.
-    //    1.1 -  Erase destination buffers ('color' and 'depth' buffers)
-    //           (glClearColor(), glClear())
-
-    // 2 - Build 'view' and 'projection' matrices:
-
-    //    2.1 - Begin with the "perspective projection matrix"
-    //          You'll need  glm::perspective(float fovy, float aspect, float zNear, float zFar)
-    //          This function defines the co called 'view frustum' of your camera.
-    //          Look up Google image for "view frustum" for schematics.
-    //          Parameters:
-    //          - 'fovy' = angle in radian, field of view according the y axis
-    //          - 'aspect' = window_width/window_height ( don't forget to cast to floats!)
-
-    //    2.2 - Define the new view matrix merging 'this->mViewMatrix' and 'modelMatrix' together
-
-    //    2.3 - Compute the matrix to transform normals.
-
-    //    2.4 - Compute the final matrix 'MVP' (acronyme for "Model View Projection")
-    //          MVP transform a vertex in local coordinates to a vertex in image coordinates
-
-    // 3 - Setting up shader parameters:
-    //    3.1 - In a 3D application there might be dozens of shaders. You must
-    //          tell OpenGl which one to use with (glUseProgram()).
-    //          Set the current shader to be used to the one you created in "this->initShaders()"
-
-    //    3.2 - Set values that are constant per object ('uniform variable' of the shader "../shaders/**.glsl"):
-    //          (take a look at the shader's source code)
-    //          You must upload to GPU you the matrices (MVP etc.) that you just
-    //          computed here on the CPU.
-    //          In other words set the shader's uniform variables with
-    //          (glGetUniformLocation() et glUniform()).
-    //          Note: You will need to convert glm matrices to a pointer with:
-    //          'float* ptr = glm::value_ptr(ma_matrice)'
-
-
-    // LAB 1 / PART I:END CODE TO COMPLETE
-    // #########################################################################
-
-
-    // #########################################################################
-    // LAB 1 / PART II:
-    // In part I leave this code untouched
-    // In part II comment or delete those lines
-#if 1
-    if (mProgram != -1)
-        mDummyObject->draw();
-#endif
-    // 4 - Instead use 'this->mMeshes' to draw the object of the scene:
-
-    // ...
-
-    // LAB 1 / PART II:END CODE TO COMPLETE
-    // #########################################################################
-}
-
-
-/// Load (from file) and upload to GPU (compile) the various meshes of our scene.
-/// (Called once when the application is launched)
-void Renderer::initGeometry()
-{
-
-    // #########################################################################
-    // LAB 1 / PART II: CODE TO COMPLETE
-
-
-    // Once PART I of lab 1 is finished and checked
-    // You can delete / disable the line below
-#if 1
-    // This builds a VAO (upload to GPU) with data for a triangle and a sphere.
-    // This is only here to test PART I without having to do PART II
-    init_dummy_object();
-#endif
-
-    // In this function we do not use OpenGL API functions. Our goal is
-    // to parse files containing our 3D objects, and upload in video memory.
-    // A parser is already available all is asked here is to explore this very
-    // project's code and find what you need.
-
-    // 1 - Build a vector of meshes (std::vector<loaders::Mesh*>)
-    // from the file "../data/camel.obj"
-    // You need to create a "loaders::obj_mtl::ObjLoader".
-    // and use the method ".load()" to parse an "camel.obj".
-    // If an error occurs print it.
-    // Retreive the parsed meshes with ".getObjects()"
-
-
-    // 2 - Convert the list of meshes to "MyGLMesh"
-    // (use this->mMeshes to store the converted objects)
-
-    // 3 - Upload to GPU with ".compileGL()"
-
-    // LAB 1 / PART II: END CODE TO COMPLETE
-    // #########################################################################
-}
-
-
 // -----------------------------------------------------------------------------
 
 /**
@@ -417,7 +321,8 @@ private:
 
     /// OpenGL identifiers for the VBOs of our mesh
     /// N.B: use VBO_VERTICES and VBO_INDICES to access this array elements
-    GLuint mVertexBufferObjects[NB_VBOS];
+    GLuint mVertexBufferObjects[
+    NB_VBOS];
 
 public:
     MyGLMesh(const Loaders::Mesh& mesh)
@@ -492,29 +397,37 @@ public:
         // 1 - Create a VAO. Generate a unique identifier for a VertexArrayObject
         // and store it in this->mVertexArrayObject
         // ( glGenVertexArrays() )
+        glAssert(glGenVertexArrays(1, &(this->mVertexArrayObject)));
 
         // 2 - Create 2 VBOs. Generate two identifiers for VertexBufferObject
         // (one for vertices VBO_VERTICES, another for faces (triangles) VBO_INDICES)
         // save them in this->mVertexBufferObjects
         // ( glGenBuffers() )
+        glAssert(glGenBuffers(2, this->mVertexBufferObjects));
 
         // 3 - Tell OpenGL which VAO we are currently working.
         // Enable the previously created VertexArrayObject (VAO)
         // ( glBindVertexArray() )
+        glAssert(glBindVertexArray(this->mVertexArrayObject));
 
         // 4 - Tell OpenGl which VBO we are currently working on. Enable the
         // previously created VertexBufferObject *for vertices*
         // (glBindBuffer())
+        glAssert(glBindBuffer(GL_ARRAY_BUFFER, this->mVertexBufferObjects[VBO_VERTICES]));
 
         // Note: VBO for vertex attributes
-        // (position, normal, speed, color, acceleration...) alway have the same
+        // (position, normal, speed, color, acceleration...) always have the same
         // type (i.e. GL_ARRAY_BUFFER)
 
         // 5 - Fill the VertexBufferObject of vertices with
         // (glBufferData())
+        glAssert(glBufferData(GL_ARRAY_BUFFER, 1, &(this->mVertexBufferObjects[VBO_VERTICES]), GL_STREAM_DRAW));
 
         // 6 - Describe the buffer memory layout / organization
         // (glVertexAttribPointer())
+        glAssert(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1, 0));
+        glAssert(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 1, 0));
+        glAssert(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 1, 0));
 
         // Note: You need to tell OpenGL how is organized your data.
         // for instance associate
@@ -524,20 +437,26 @@ public:
 
         // 7 - Enable which attributes are to be used (position, normal, etc.)
         // (glEnableVertexAttribArray)
+        glAssert(glEnableVertexAttribArray(0));
+        glAssert(glEnableVertexAttribArray(1));
+        glAssert(glEnableVertexAttribArray(2));
 
         // 8 - Enable the VertexBufferObject *for faces*.
         // Be careful this VBO is a list of faces therefore his type is GL_ELEMENT_ARRAY_BUFFER
         // and not GL_ARRAY_BUFFER which is used for vertex attributes
         // ...
+        glAssert(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->mVertexBufferObjects[VBO_INDICES]));
 
         // 9 - Fill VertexBufferObject *of faces*
         // ...
+        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 1, &(this->mVertexBufferObjects[VBO_INDICES]), GL_STREAM_DRAW));
+
 
         // LAB 1 / PART II: END CODE TO COMPLETE
         // #####################################################################
 
 
-        // Binding to 0 means 'unBind()' and garantees no buffer is enabled
+        // Binding to 0 means 'unBind()' and guarantees no buffer is enabled
         glAssert(glBindVertexArray(0));
     }
 
@@ -551,10 +470,12 @@ public:
 
 
         // 1 - Enable the VAO (bind)
+        glAssert(glBindVertexArray(this->mVertexArrayObject));
 
         // 2 - Draw triangles.
-        // Les sommets des triangles étant indexés et non consécutifs (sauf cas très particulier)
-        // on utilisera la fonction glDrawElements(...)
+        // The vertices of the triangles being indexed and not consecutive (except in very specific cases)
+        // we will use the glDrawElements (...) function
+        glAssert(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, this->mVertexBufferObjects));
 
         // Watch out! The "count" parameter of glDrawElements() does not define
         // the number of triangles but the actual size your index buffer.
@@ -585,6 +506,170 @@ public:
 
 
 // -----------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+
+/// "Render loop": this function is automatically called every time every time the
+/// screen/window is refreshed
+void Renderer::render()
+{
+    // We declare the 4x4 matrix to transform object of the scene,
+    // the so called "model matrix":
+    // For this lab no animation so we use the identity matrix.
+    // The constructor glm::mat4x4(float) set the diagonal values therefore:
+    const glm::mat4x4 modelMatrix(1.0f);
+    // Is the identiry matrix:
+    // 1 0 0 0
+    // 0 1 0 0
+    // 0 0 1 0
+    // 0 0 0 1
+
+    // #########################################################################
+    // LAB 1 / PART I: CODE TO COMPLETE
+
+
+    // This is the main function to render/compute the image
+    // We must call the openGL API functions (very low level) to command the GPU
+    // to draw our scene correctly using rasterization .
+
+
+    // 1 - Prepare our image for rendering: Remember this actually a look
+    //     and this function gets called over and over again so we must erase
+    //     previous drawings and start fresh.
+    //    1.1 -  Erase destination buffers ('color' and 'depth' buffers)
+    //           (glClearColor(), glClear())
+    glClearColor(.2f, .2f, .2f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // 2 - Build 'view' and 'projection' matrices:
+
+    //    2.1 - Begin with the "perspective projection matrix"
+    //          You'll need  glm::perspective(float fovy, float aspect, float zNear, float zFar)
+    //          This function defines the co called 'view frustum' of your camera.
+    //          Look up Google image for "view frustum" for schematics.
+    //          Parameters:
+    //          - 'fovy' = angle in radian, field of view according the y axis
+    //          - 'aspect' = window_width/window_height ( don't forget to cast to floats!)
+//    glm::mat4 perspectiveProjectionMat =  glm::perspective((GLfloat)glm::radians(90), 1.5f, 0.1f, 100.f);
+    glm::mat4 projectionMat =  glm::perspective((GLfloat)glm::radians(90.f), (float)mWidth/(float)mHeight , 0.f, 200.f);
+
+    //    2.2 - Define the new view matrix merging 'this->mViewMatrix' and 'modelMatrix' together
+//    glm::mat4 newViewMatrix = glm::matrixCompMult(modelMatrix, this->mViewMatrix);
+    glm::mat4 newViewMatrix = this->mViewMatrix * modelMatrix;
+
+    //    2.3 - Compute the matrix to transform normals.
+    glm::mat4 normalTransformMat = glm::transpose(glm::inverse(modelMatrix));
+
+    //    2.4 - Compute the final matrix 'MVP' (acronyme for "Model View Projection")
+    //          MVP transform a vertex in local coordinates to a vertex in image coordinates
+    glm::mat4 MVP = projectionMat * newViewMatrix * modelMatrix;
+
+    // 3 - Setting up shader parameters:
+    //    3.1 - In a 3D application there might be dozens of shaders. You must
+    //          tell OpenGl which one to use with (glUseProgram()).
+    //          Set the current shader to be used to the one you created in "this->initShaders()"
+    glAssert(glUseProgram(mProgram));
+    //    3.2 - Set values that are constant per object ('uniform variable' of the shader "../shaders/**.glsl"):
+    //          (take a look at the shader's source code)
+    //          You must upload to GPU you the matrices (MVP etc.) that you just
+    //          computed here on the CPU.
+    //          In other words set the shader's uniform variables with
+    //          (glGetUniformLocation() et glUniform()).
+    //          Note: You will need to convert glm matrices to a pointer with:
+    //          'float* ptr = glm::value_ptr(ma_matrice)'
+    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"modelViewMatrix"), \
+                                1, false, (float*)glm::value_ptr(newViewMatrix)));
+    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"projectionMatrix"), \
+                                1, false, (float*)glm::value_ptr(projectionMat)));
+    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"normalMatrix"), \
+                                1, false, (float*)glm::value_ptr(normalTransformMat)));
+    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"MVP"), \
+                                1, false, (float*)glm::value_ptr(MVP)));
+
+
+
+    // LAB 1 / PART I:END CODE TO COMPLETE
+    // #########################################################################
+
+
+    // #########################################################################
+    // LAB 1 / PART II:
+    // In part I leave this code untouched
+    // In part II comment or delete those lines
+//#if 1
+//    if (mProgram != -1)
+//        mDummyObject->draw();
+//#endif
+    // 4 - Instead use 'this->mMeshes' to draw the object of the scene:
+
+    // ...
+
+    // LAB 1 / PART II:END CODE TO COMPLETE
+    // #########################################################################
+}
+
+
+/// Load (from file) and upload to GPU (compile) the various meshes of our scene.
+/// (Called once when the application is launched)
+void Renderer::initGeometry()
+{
+
+    // #########################################################################
+    // LAB 1 / PART II: CODE TO COMPLETE
+
+
+    // Once PART I of lab 1 is finished and checked
+    // You can delete / disable the line below
+
+    // This builds a VAO (upload to GPU) with data for a triangle and a sphere.
+    // This is only here to test PART I without having to do PART II
+//#if 1
+//    init_dummy_object();
+//#endif
+
+    // In this function we do not use OpenGL API functions. Our goal is
+    // to parse files containing our 3D objects, and upload in video memory.
+    // A parser is already available all is asked here is to explore this very
+    // project's code and find what you need.
+
+    // 1 - Build a vector of meshes (std::vector<loaders::Mesh*>)
+    // from the file "../data/camel.obj"
+    // You need to create a "loaders::obj_mtl::ObjLoader".
+    // and use the method ".load()" to parse an "camel.obj".
+    // If an error occurs print it.
+    // Retreive the parsed meshes with ".getObjects()"
+    std::vector <Loaders::Mesh*> meshes;
+    Loaders::Obj_mtl::ObjLoader loader;
+    QString err = "File not found!";
+    bool flag = loader.load("../data/camel.obj", err);
+    loader.getObjects(meshes);
+
+
+    // 2 - Convert the list of meshes to "MyGLMesh"
+    // (use this->mMeshes to store the converted objects)
+
+    std::cout << "flag = " << flag << std::endl;
+    std::cout << "size = " << meshes.size() << std::endl;
+
+    std::vector<MyGLMesh*> MM(meshes.size());
+    for (unsigned int i = 0; i < meshes.size(); i++)
+    {
+        std::cout << "BANANA" << std::endl;
+        MM[i] = (RenderSystem::MyGLMesh*)(meshes[i]);
+        this->mMeshes = MM;
+    }
+
+    // 3 - Upload to GPU with ".compileGL()"
+//    for (unsigned int i = 0; i <= this->mMeshes.size(); i++)
+//    {
+//        this->mMeshes[i]->compileGL();
+//    }
+    // LAB 1 / PART II: END CODE TO COMPLETE
+    // #########################################################################
+}
+
+
 
 int Renderer::handleMouseEvent(const MouseEvent& event)
 {
@@ -713,7 +798,7 @@ void Renderer::init_dummy_object()
     mDummyObject->set_attr_index(GlDirectDraw::ATTR_TEX_COORD, 2);
     mDummyObject->set_auto_flat_normals(true);
 
-    // Define a simple trianlge
+    // Define a simple triangle
     mDummyObject->begin(GL_TRIANGLES);
     mDummyObject->color3f(1.f, 0.f, 1.f);
     mDummyObject->vertex3f(0.f, 0.f, 0.2f);
