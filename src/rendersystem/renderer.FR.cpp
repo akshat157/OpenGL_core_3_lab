@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
  *   Copyright (C) 2012 by Mathias Paulin                                  *
  *   Mathias.Paulin@irit.fr                                                *
  *                                                                         *
@@ -318,63 +318,14 @@ void Renderer::render()
         mDummyObject->draw();
 #endif
     // 4 - Dessiner les objets de la scène dans l'attribut 'mMeshes':
+    draw_list_mesh();
+    
     // #####################################
     // TP 1 / PARTIE II:Fin du code à écrire
     // #####################################
 }
 
-//-------------------------------------------
-// Chargement et compilation des données géométriques de l'application.
-//-------------------------------------------
-void Renderer::initGeometry()
-{
-
-// ########################################
-// TP 1 / PARTIE II: Début du code à écrire
-// ########################################
-
-// Une fois la partie I finie et vérifier désactivé le code si dessous
-// et changeant la macro if de 1 vers 0
-#if 1
-    // Construction d'un VAO contenant un triangle et une sphère.
-    // Ce code est utile pour pouvoir tester le réglage du pipeline OpenGl
-    // fait en Partie I sans devoir charger un maillage
-    init_dummy_object();
-#endif
-
-    // ################
-    // TP 1 / PARTIE II
-    // ################
-
-    // Le code de cette méthode ne nécessite pas de commandes OpenGl. Il s'agit
-    // seulement de parser les fichiers contenant les objets 3D, puis de les
-    // charger en mémoire vidéo.
-    // Le parseur est déjà codé. Ici on vous demande simplement de savoir
-    // explorer le code déjà existant dans ce projet et de l'utiliser.
-
-    // 1 - Construire un vecteur de maillages (std::vector<loaders::Mesh*>)
-    // à partir du fichier "../data/camel.obj"
-    // Créer une instance d'un objet de type "loaders::obj_mtl::ObjLoader".
-    // Utiliser la méthode ".load()" pour charger le fichier ".obj".
-    // Si une erreur est intervenue pendant le chargement, afficher cette erreur.
-    // S'il n'y a pas d'erreur, utiliser la méthode ".getObjects()"
-    // sur l'objet de type "loaders::obj_mtl::ObjLoader" pour récupérer
-    // l'ensemble des maillages chargés dans un vecteur de type std::vector<loaders::Mesh*>
-
-    // 2 - Transformer ces maillages en maillages affichables de type "MyGLMesh"
-    // (ils seront stockés dans l'attribut mMeshes)
-
-    // 3 - Faites l'upload vers GPU avec ".compileGL()"
-
-    // ######################################
-    // TP 1 / PARTIE II: Fin du code à écrire
-    // ######################################
-}
-
-
-// -----------------------------------------------------------------------------
-
-/**
+ /**
   * @ingroup RenderSystem
   * A mesh with OpenGL rendering capabilities.
   */
@@ -448,15 +399,15 @@ public:
                 VertexBufferObject _list_of_normales[NB_VERTS]; // Array of vertex normals
                 // ...
 
-                // List of vertex index in VBOs defining a triangle every 3 elements :
-                // First triangle: (_list_of_triangles[0], _list_of_triangles[1], _list_of_triangles[2])
-                ElementBufferObject _list_of_triangles[NB_TRIS];
+        // List of vertex index in VBOs defining a triangle every 3 elements :
+        // First triangle: (_list_of_triangles[0], _list_of_triangles[1], _list_of_triangles[2])
+        ElementBufferObject _list_of_triangles[NB_TRIS];
 
-            };
-            Même si OpenGL ne stocke pas exactement les VAOs de cette façon cela
+    };
+    Même si OpenGL ne stocke pas exactement les VAOs de cette façon cela
             vous donne une bonne idée de l'organisation. Créer les structures
-            et remplir les champs se fera avec des fonctions du type glXXX().
-        */
+        et remplir les champs se fera avec des fonctions du type glXXX().
+                */
 
         // ########################################
         // TP 1 / PARTIE II: Début du code à écrire
@@ -497,49 +448,111 @@ public:
         // Un bind sur l'index 0 est en fait un 'unBind()' garantissant qu'aucun
         // buffer n'est activé
         glAssert(glBindVertexArray(0));
-    }
+}
 
-    /// Draws the VertexArrayObjects (VAO "mVertexArrayObject") of the mesh.
-    void drawGL()
-    {
-        // Affiche le maillage chargé en mémoire vidéo en utilisant le VAO
+/// Draws the VertexArrayObjects (VAO "mVertexArrayObject") of the mesh.
+void drawGL()
+{
+    // Affiche le maillage chargé en mémoire vidéo en utilisant le VAO
 
-        // ########################################
-        // TP 1 / PARTIE II: Début du code à écrire
-        // ########################################
-        // 1 - Activer le VAO (bind)
+    // ########################################
+    // TP 1 / PARTIE II: Début du code à écrire
+    // ########################################
+    // 1 - Activer le VAO (bind)
 
-        // 2 - Dessiner les triangles.
-        // Les sommets des triangles étant indexés et non consécutifs (sauf cas très particulier)
-        // on utilisera la fonction glDrawElements(...)
-        // N.B: !attention! le paramètre "count" de glDrawElements() ne désigne
-        // pas le nombre de triangles mais la taille du tableau d'index de sommets
-        // (c-a-d le nombre d'entiers dans le vertex buffer element VBE)
+    // 2 - Dessiner les triangles.
+    // Les sommets des triangles étant indexés et non consécutifs (sauf cas très particulier)
+    // on utilisera la fonction glDrawElements(...)
+    // N.B: !attention! le paramètre "count" de glDrawElements() ne désigne
+    // pas le nombre de triangles mais la taille du tableau d'index de sommets
+    // (c-a-d le nombre d'entiers dans le vertex buffer element VBE)
 
-        // ######################################
-        // TP 1 / PARTIE II: Fin du code à écrire
-        // ######################################
-    }
+    // ######################################
+    // TP 1 / PARTIE II: Fin du code à écrire
+    // ######################################
+}
 
-    /// Destructor
-    ~MyGLMesh()
-    {
-        // ########################################
-        // TP 1 / PARTIE II: Début du code à écrire
-        // ########################################
-        // 1 - Supprimer VBO et VBE glDeleteBuffers()
+/// Destructor
+~MyGLMesh()
+{
+    // ########################################
+    // TP 1 / PARTIE II: Début du code à écrire
+    // ########################################
+    // 1 - Supprimer VBO et VBE glDeleteBuffers()
 
-        // 2 - Supprimer VAO glDeleteVertexArrays()
+    // 2 - Supprimer VAO glDeleteVertexArrays()
 
-        // ######################################
-        // TP 1 / PARTIE II: Fin du code à écrire
-        // ######################################
-    }
+    // ######################################
+    // TP 1 / PARTIE II: Fin du code à écrire
+    // ######################################
+}
 };
-
 
 // -----------------------------------------------------------------------------
 
+//-------------------------------------------
+// Chargement et compilation des données géométriques de l'application.
+//-------------------------------------------
+void Renderer::initGeometry()
+{
+
+// ########################################
+// TP 1 / PARTIE II: Début du code à écrire
+// ########################################
+
+// Une fois la partie I finie et vérifier désactivé le code si dessous
+// et changeant la macro if de 1 vers 0
+#if 1
+    // Construction d'un VAO contenant un triangle et une sphère.
+    // Ce code est utile pour pouvoir tester le réglage du pipeline OpenGl
+    // fait en Partie I sans devoir charger un maillage
+    init_dummy_object();
+#endif
+
+    // ################
+    // TP 1 / PARTIE II
+    // ################
+
+    // Le code de cette méthode ne nécessite pas de commandes OpenGl. Il s'agit
+    // seulement de parser les fichiers contenant les objets 3D, puis de les
+    // charger en mémoire vidéo.
+    // Le parseur est déjà codé. Ici on vous demande simplement de savoir
+    // explorer le code déjà existant dans ce projet et de l'utiliser.
+
+    // 1 - Construire un vecteur de maillages (std::vector<loaders::Mesh*>)
+    // à partir du fichier "../data/camel.obj"
+    // Créer une instance d'un objet de type "loaders::obj_mtl::ObjLoader".
+    // Utiliser la méthode ".load()" pour charger le fichier ".obj".
+    // Si une erreur est intervenue pendant le chargement, afficher cette erreur.
+    // S'il n'y a pas d'erreur, utiliser la méthode ".getObjects()"
+    // sur l'objet de type "loaders::obj_mtl::ObjLoader" pour récupérer
+    // l'ensemble des maillages chargés dans un vecteur de type std::vector<loaders::Mesh*>
+
+    // 2 - Transformer ces maillages en maillages affichables de type "MyGLMesh"
+    // (ils seront stockés dans l'attribut mMeshes)
+
+    // 3 - Faites l'upload vers GPU avec ".compileGL()"
+
+    // ######################################
+    // TP 1 / PARTIE II: Fin du code à écrire
+    // ######################################
+}
+ 
+// -----------------------------------------------------------------------------
+
+void Renderer::draw_list_mesh()
+{
+    // #########################################################################
+    // TP 1 / PARTIE II: Début du code à écrire
+
+    // 4 - Dessiner les objets de la scène dans l'attribut 'mMeshes':
+
+    // TP 1 / PARTIE II: Fin du code à écrire
+    // #########################################################################
+}
+
+// -----------------------------------------------------------------------------
+ 
 int Renderer::handleMouseEvent(const MouseEvent& event)
 {
     //static int modifiers = 0;
