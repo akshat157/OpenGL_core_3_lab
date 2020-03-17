@@ -4,11 +4,11 @@ warning: Tag `SHOW_DIRECTORIES' at line 542 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
 warning: Tag `HTML_ALIGN_MEMBERS' at line 971 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
-warning: Tag `USE_INLINE_TREES' at line 1157 of file `-' has become obsolete.
+warning: Tag `USE_INLINE_TREES' at line 1158 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
-warning: Tag `XML_SCHEMA' at line 1420 of file `-' has become obsolete.
+warning: Tag `XML_SCHEMA' at line 1421 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
-warning: Tag `XML_DTD' at line 1426 of file `-' has become obsolete.
+warning: Tag `XML_DTD' at line 1427 of file `-' has become obsolete.
          To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
 warning: the dot tool could not be found at /usr/local/bin/
 /media/ancientfuture/New Volume/bns/OpenGL_core_3_lab/src/rendersystem/renderer.EN.cpp:32: warning: missing title after \defgroup RendererGlobalFunctions

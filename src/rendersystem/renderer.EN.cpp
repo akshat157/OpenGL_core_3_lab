@@ -100,7 +100,7 @@ void Renderer::initView()
     // To fill "mViewMatrix" you can use
     // "glm::lookAt()" which helps to compute the view matrix
 
-    this->mViewMatrix = glm::lookAt(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    this->mViewMatrix = glm::lookAt(glm::vec3(2.f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
@@ -392,10 +392,10 @@ void Renderer::render()
     // LAB 1 / PART II:
     // In part I leave this code untouched
     // In part II comment or delete those lines
-#if 1
-    if (mProgram != -1)
-        mDummyObject->draw();
-#endif
+//#if 1
+//    if (mProgram != -1)
+//        mDummyObject->draw();
+//#endif
     // 4 - Instead use 'this->mMeshes' to draw the object of the scene:
     draw_list_mesh();
 
@@ -486,19 +486,19 @@ public:
 
         ElementBufferObject _list_of_triangles[NB_TRIS*3];
 
-    };
-    Well, OpenGL might not store things exactly like this VAOs but
-              this give you an idea. accessing the structure directly is not
-              possible you must use glXXX() accessors.
-              */
+        Well, OpenGL might not store things exactly like this VAOs but
+        this give you an idea. accessing the structure directly is not
+        possible you must use glXXX() accessors.
+        */
 
-              // #####################################################################
-              // LAB 1 / PART II: CODE TO COMPLETE
+        // #####################################################################
+        // LAB 1 / PART II: CODE TO COMPLETE
 
 
         // 1 - Create a VAO. Generate a unique identifier for a VertexArrayObject
         // and store it in this->mVertexArrayObject
         // ( glGenVertexArrays() )
+//        std::cout<<"AAA = "<< this->mVertices <<std::endl;
         glAssert(glGenVertexArrays(1, &(this->mVertexArrayObject)));
 
         // 2 - Create 2 VBOs. Generate two identifiers for VertexBufferObject
@@ -523,19 +523,19 @@ public:
 
         // 5 - Fill the VertexBufferObject of vertices with
         // (glBufferData())
-        glAssert(glBufferData(GL_ARRAY_BUFFER, 1, &(this->mVertexBufferObjects[VBO_VERTICES]), GL_STREAM_DRAW));
+        glAssert(glBufferData(GL_ARRAY_BUFFER, mNbVertices*sizeof(Vertex), &mVertices[0], GL_STATIC_DRAW));
 
         // 6 - Describe the buffer memory layout / organization
         // (glVertexAttribPointer())
-        glAssert(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 1, 0));
-        glAssert(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 1, 0));
-        glAssert(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 1, 0));
+        glAssert(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0));
+        glAssert(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3))));
+        glAssert(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)+sizeof(glm::vec3))));
 
-              // Note: You need to tell OpenGL how is organized your data.
-              // for instance associate
-              // - position      -> (index 0)
-              // - normal        -> (index 1)
-              // - texture coord -> (index 2)
+        // Note: You need to tell OpenGL how is organized your data.
+        // for instance associate
+        // - position      -> (index 0)
+        // - normal        -> (index 1)
+        // - texture coord -> (index 2)
 
         // 7 - Enable which attributes are to be used (position, normal, etc.)
         // (glEnableVertexAttribArray)
@@ -551,120 +551,63 @@ public:
 
         // 9 - Fill VertexBufferObject *of faces*
         // ...
-        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 1, &(this->mVertexBufferObjects[VBO_INDICES]), GL_STREAM_DRAW));
+//        std::cout<<sizeof(VertexArray)<<std::endl;
+        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mNbTriangles*sizeof(TriangleIndex), &mTriangles[0], GL_STATIC_DRAW));
 
 
-              // LAB 1 / PART II: END CODE TO COMPLETE
-              // #####################################################################
+        // LAB 1 / PART II: END CODE TO COMPLETE
+        // #####################################################################
 
 
         // Binding to 0 means 'unBind()' and guarantees no buffer is enabled
         glAssert(glBindVertexArray(0));
     }
 
-/// Draw the VertexArrayObjects (VAO "mVertexArrayObject") of the mesh.
-void drawGL()
-{
-    // Draw the mesh loaded in video memory thanks to our VAO
+    /// Draw the VertexArrayObjects (VAO "mVertexArrayObject") of the mesh.
+    void drawGL()
+    {
+        // Draw the mesh loaded in video memory thanks to our VAO
 
-    // #####################################################################
-    // LAB 1 / PART II: CODE TO COMPLETE
-
-
-        // 1 - Enable the VAO (bind)
-        glAssert(glBindVertexArray(this->mVertexArrayObject));
-
-        // 2 - Draw triangles.
-        // The vertices of the triangles being indexed and not consecutive (except in very specific cases)
-        // we will use the glDrawElements (...) function
-        glAssert(glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, this->mVertexBufferObjects));
-
-    // Watch out! The "count" parameter of glDrawElements() does not define
-    // the number of triangles but the actual size your index buffer.
-    // (i.e. the number of integers stored in your GL_ELEMENT_ARRAY_BUFFER)
+        // #####################################################################
+        // LAB 1 / PART II: CODE TO COMPLETE
 
 
-    // LAB 1 / PART II: END CODE TO COMPLETE
-    // #####################################################################
-}
+            // 1 - Enable the VAO (bind)
+            glAssert(glBindVertexArray(this->mVertexArrayObject));
 
-/// Destructor
-~MyGLMesh()
-{
-    // #####################################################################
-    // LAB 1 / PART II: CODE TO COMPLETE
+            // 2 - Draw triangles.
+            // The vertices of the triangles being indexed and not consecutive (except in very specific cases)
+            // we will use the glDrawElements (...) function
+            glAssert(glDrawElements(GL_TRIANGLES, mNbTriangles*sizeof(TriangleIndex), GL_UNSIGNED_INT, 0));
 
-    // 1 - delete VBO and VBE
-    // glDeleteBuffers()
-
-    // 2 - Delete VAO
-    // glDeleteVertexArrays()
+        // Watch out! The "count" parameter of glDrawElements() does not define
+        // the number of triangles but the actual size your index buffer.
+        // (i.e. the number of integers stored in your GL_ELEMENT_ARRAY_BUFFER)
 
 
-    // LAB 1 / PART II: END CODE TO COMPLETE
-    // #####################################################################
-}
+        // LAB 1 / PART II: END CODE TO COMPLETE
+        // #####################################################################
+    }
+
+    /// Destructor
+    ~MyGLMesh()
+    {
+        // #####################################################################
+        // LAB 1 / PART II: CODE TO COMPLETE
+
+        // 1 - delete VBO and VBE
+        // glDeleteBuffers()
+
+        // 2 - Delete VAO
+        // glDeleteVertexArrays()
+
+
+        // LAB 1 / PART II: END CODE TO COMPLETE
+        // #####################################################################
+    }
 };
 
 // -----------------------------------------------------------------------------
-
-/// Load (from file) and upload to GPU (compile) the various meshes of our scene.
-/// (Called once when the application is launched)
-void Renderer::initGeometry()
-{
-
-    // #########################################################################
-    // LAB 1 / PART II: CODE TO COMPLETE
-
-
-    // Once PART I of lab 1 is finished and checked
-    // You can delete / disable the line below
-#if 1
-    // This builds a VAO (upload to GPU) with data for a triangle and a sphere.
-    // This is only here to test PART I without having to do PART II
-    init_dummy_object();
-#endif
-
-    // In this function we do not use OpenGL API functions. Our goal is
-    // to parse files containing our 3D objects, and upload in video memory.
-    // A parser is already available all is asked here is to explore this very
-    // project's code and find what you need.
-
-    // 1 - Build a vector of meshes (std::vector<loaders::Mesh*>)
-    // from the file "../data/camel.obj"
-    // You need to create a "loaders::obj_mtl::ObjLoader".
-    // and use the method ".load()" to parse an "camel.obj".
-    // If an error occurs print it.
-    // Retreive the parsed meshes with ".getObjects()"
-
-
-    // 2 - Convert the list of meshes to "MyGLMesh"
-    // (use this->mMeshes to store the converted objects)
-
-    // 3 - Upload to GPU with ".compileGL()"
-
-    // LAB 1 / PART II: END CODE TO COMPLETE
-    // #########################################################################
-}
-
-// -----------------------------------------------------------------------------
-
-void Renderer::draw_list_mesh()
-{
-    // #########################################################################
-    // LAB 1 / PARTIE II: 
-
-    // 4 - Dessiner les objets de la scène dans l'attribut 'mMeshes':
-
-    for (std::vector<MyGLMesh*>::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it ) {
-        (*it)->drawGL();
-    }
-    // LAB 1 / PART II: 
-    // #########################################################################
-}
-
-// -----------------------------------------------------------------------------
-
 
 /// Load (from file) and upload to GPU (compile) the various meshes of our scene.
 /// (Called once when the application is launched)
@@ -698,34 +641,42 @@ void Renderer::initGeometry()
     std::vector <Loaders::Mesh*> meshes;
     Loaders::Obj_mtl::ObjLoader loader;
     QString err = "File not found!";
-    bool flag = loader.load("../data/camel.obj", err);
+    loader.load("../data/camel.obj", err);
     loader.getObjects(meshes);
-
 
     // 2 - Convert the list of meshes to "MyGLMesh"
     // (use this->mMeshes to store the converted objects)
 
-    std::cout << "flag = " << flag << std::endl;
-    std::cout << "size = " << meshes.size() << std::endl;
-
     std::vector<MyGLMesh*> MM(meshes.size());
-    for (unsigned int i = 0; i < meshes.size(); i++)
-    {
-        std::cout << "BANANA" << std::endl;
+    for (unsigned int i = 0; i < meshes.size(); i++) {
         MM[i] = (RenderSystem::MyGLMesh*)(meshes[i]);
-        this->mMeshes = MM;
     }
+    this->mMeshes = MM;
 
     // 3 - Upload to GPU with ".compileGL()"
-//    for (unsigned int i = 0; i <= this->mMeshes.size(); i++)
-//    {
-//        this->mMeshes[i]->compileGL();
-//    }
+    for (std::vector<MyGLMesh*>::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it) {
+        (*it)->compileGL();
+    }
+
     // LAB 1 / PART II: END CODE TO COMPLETE
     // #########################################################################
 }
 
+// -----------------------------------------------------------------------------
 
+void Renderer::draw_list_mesh()
+{
+    // #########################################################################
+    // LAB 1 / PARTIE II:
+
+    // 4 - Dessiner les objets de la scène dans l'attribut 'mMeshes':
+
+    for (std::vector<MyGLMesh*>::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it ) {
+        (*it)->drawGL();
+    }
+    // LAB 1 / PART II:
+    // #########################################################################
+}
 
 int Renderer::handleMouseEvent(const MouseEvent& event)
 {
