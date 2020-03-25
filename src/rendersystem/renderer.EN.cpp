@@ -100,7 +100,7 @@ void Renderer::initView()
     // To fill "mViewMatrix" you can use
     // "glm::lookAt()" which helps to compute the view matrix
 
-    this->mViewMatrix = glm::lookAt(glm::vec3(1.0f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    this->mViewMatrix = glm::lookAt(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
@@ -156,7 +156,6 @@ void printProgramInfoLog(GLint program)
 /// (Called once when the application is launched)
 void Renderer::initShaders()
 {
-
     // #########################################################################
     // LAB 1 / PART I: CODE TO COMPLETE
 
@@ -746,7 +745,36 @@ int Renderer::handleMouseEvent(const MouseEvent& event)
         //modifiers = event.modifiers;
     }
 
+
+
+    //    std::cout<<"viewmat"<<std::endl;
+//    for (int i = 0; i < 4; i++)
+//    {
+//        for (int j = 0; j < 4; j++)
+//        {
+//            std::cout<<this->mViewMatrix[i][j] << " ";
+//        }
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
+//    std::cout<<"inv"<<std::endl;
+//    for (int i = 0; i < 4; i++)
+//    {
+//        for (int j = 0; j < 4; j++)
+//        {
+//            std::cout<<invViewMat[i][j] << " ";
+//        }
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<std::endl;
+
     if (event.button == MouseEvent::MOVE) {
+        // To get the xvec and yvec, i.e. axes of the camera.
+        glm::mat4 invViewMat = glm::inverse(this->mViewMatrix);
+
+        glm::vec3 right = glm::vec3(invViewMat[0][0], invViewMat[0][1], invViewMat[0][2]);
+        glm::vec3 up = glm::vec3(invViewMat[1][0], invViewMat[1][1], invViewMat[1][2]);
+        glm::vec3 position = glm::vec3(invViewMat[2][0], invViewMat[2][1], invViewMat[2][2]);
 
         // Note: The frame of the camera is i, j, k encoded into the
         // this->mViewMatrix, Find by yourself you to extract i, j, k from this
@@ -760,21 +788,33 @@ int Renderer::handleMouseEvent(const MouseEvent& event)
 
         switch (button) {
         case MouseEvent::LEFT: {
-            float a = dx, b = dy;
-            a = b;
-            b = a; // HACK: Avoid unsued warning
 
             // 1 - Retrieve xvec and yvec axis of the camera
+            glm::vec3 yvec = up;
+            glm::vec3 xvec = right;
+
             // 2 - Modify mViewMatrix in order to rotate about dy*360.f degres around xvec
+            this->mViewMatrix = glm::rotate(this->mViewMatrix, dy*30.f, xvec);
             // 3 - Modify mViewMatrix in order to rotate about dx*360.f degres around yvec
+            this->mViewMatrix = glm::rotate(this->mViewMatrix, dx*30.f, yvec);
         } break;
         case MouseEvent::RIGHT: {
+
             // 1 - Compute the translation vector xvec and yvec according to the camera X and Y axis
+            GLfloat speed = 5.0f;
+            glm::vec3 xvec = right * dx * speed;
+            glm::vec3 yvec = up * dy * -speed;
+
             // 2 - Modify mViewMatrix to translate about xvec+yvec
+            this->mViewMatrix = glm::translate(this->mViewMatrix, xvec+yvec);
         } break;
         case MouseEvent::MIDDLE: {
             // 1 - Compute the translation vector zvec according to the camera Z axis
+            glm::vec3 direction = glm::vec3(this->mViewMatrix[0][2], this->mViewMatrix[1][2], this->mViewMatrix[2][2]);
+            glm::vec3 zvec = direction * dy;    // Moving the mouse up and down governs how much to zoom in or zoom out.
             // 2 - Modify mViewMatrix to translate about zvec
+            this->mViewMatrix = glm::translate(this->mViewMatrix, zvec);
+
         } break;
         }
 
