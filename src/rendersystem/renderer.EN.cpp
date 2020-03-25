@@ -100,7 +100,7 @@ void Renderer::initView()
     // To fill "mViewMatrix" you can use
     // "glm::lookAt()" which helps to compute the view matrix
 
-    this->mViewMatrix = glm::lookAt(glm::vec3(2.f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    this->mViewMatrix = glm::lookAt(glm::vec3(1.0f, 0.f, 0.f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     // LAB 1 / PART I: END CODE TO COMPLETE
     // #########################################################################
@@ -280,23 +280,28 @@ void Renderer::initShaders()
 //------------------------------------------------------------------------------
 
 /// Erase shader programs
-void Renderer::clearShaders()
+void Renderer::clearShaders()   // FIXED
 {
     // #########################################################################
     // LAB 1 / PART I: CODE TO COMPLETE
 
 
     // 1 - Detach shader programs ( glDetachShader() )
+    glAssert(glDetachShader(mProgram, mVertexShaderId));
+    glAssert(glDetachShader(mProgram, mFragmentShaderId));
 
     // 2 - Clean shaders (vertex, fragment shaders) ( glDeleteShader() )
     // Note: if you don't detach shaders OpenGL might not actually delete
     // shaders upon the call of glDeleteShader() !
+    glAssert(glDeleteShader(mVertexShaderId));
+    glAssert(glDeleteShader(mFragmentShaderId));
 
     // 3 - delete the "program shader" itself
     // Note: only the program shader is actually necessary to draw objects.
     // The individual shaders are only necessary before linking. After linking
     // and producing the final program we could have delete those individual
     // shaders in initShaders().
+    glAssert(glDeleteProgram(mProgram));
 
 
     // LAB 1 / PART I:END CODE TO COMPLETE
@@ -346,19 +351,21 @@ void Renderer::render()
     //          Parameters:
     //          - 'fovy' = angle in radian, field of view according the y axis
     //          - 'aspect' = window_width/window_height ( don't forget to cast to floats!)
-//    glm::mat4 perspectiveProjectionMat =  glm::perspective((GLfloat)glm::radians(90), 1.5f, 0.1f, 100.f);
-    glm::mat4 projectionMat =  glm::perspective((GLfloat)glm::radians(90.f), (float)mWidth/(float)mHeight , 0.f, 200.f);
+
+    // FIXED
+    glm::mat4 projectionMat =  glm::perspective(90.0f, (float)mWidth/(float)mHeight , 0.1f, 100.f);
 
     //    2.2 - Define the new view matrix merging 'this->mViewMatrix' and 'modelMatrix' together
-//    glm::mat4 newViewMatrix = glm::matrixCompMult(modelMatrix, this->mViewMatrix);
     glm::mat4 newViewMatrix = this->mViewMatrix * modelMatrix;
 
     //    2.3 - Compute the matrix to transform normals.
-    glm::mat4 normalTransformMat = glm::transpose(glm::inverse(modelMatrix));
+    // FIXED
+    glm::mat4 normalTransformMat = glm::transpose(glm::inverse(newViewMatrix));
 
     //    2.4 - Compute the final matrix 'MVP' (acronyme for "Model View Projection")
     //          MVP transform a vertex in local coordinates to a vertex in image coordinates
-    glm::mat4 MVP = projectionMat * newViewMatrix * modelMatrix;
+    // FIXED
+    glm::mat4 MVP = projectionMat * newViewMatrix;
 
     // 3 - Setting up shader parameters:
     //    3.1 - In a 3D application there might be dozens of shaders. You must
@@ -373,14 +380,21 @@ void Renderer::render()
     //          (glGetUniformLocation() et glUniform()).
     //          Note: You will need to convert glm matrices to a pointer with:
     //          'float* ptr = glm::value_ptr(ma_matrice)'
-    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"modelViewMatrix"), \
-                                1, false, (float*)glm::value_ptr(newViewMatrix)));
-    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"projectionMatrix"), \
-                                1, false, (float*)glm::value_ptr(projectionMat)));
-    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"normalMatrix"), \
-                                1, false, (float*)glm::value_ptr(normalTransformMat)));
-    glAssert(glUniformMatrix4fv(glGetUniformLocation(mProgram, (GLchar*)"MVP"), \
-                                1, false, (float*)glm::value_ptr(MVP)));
+    // FIXED
+//    glAssert( glUniformMatrix4fv( glGetUniformLocation(mProgram, (GLchar*)"modelViewMatrix"), 1, false, (float*)glm::value_ptr(newViewMatrix)) ) ;
+//    glAssert( glUniformMatrix4fv( glGetUniformLocation(mProgram, (GLchar*)"projectionMatrix"), 1, false, (float*)glm::value_ptr(projectionMat)) );
+//    glAssert( glUniformMatrix4fv( glGetUniformLocation(mProgram, (GLchar*)"normalMatrix"), 1, false, (float*)glm::value_ptr(normalTransformMat)));
+//    glAssert( glUniformMatrix4fv( glGetUniformLocation(mProgram, (GLchar*)"MVP"), 1, false, (float*)glm::value_ptr(MVP)));
+    GLuint transformLoc[4];
+    glAssert( transformLoc[0] = glGetUniformLocation(mProgram, (GLchar*)"modelViewMatrix")  );
+    glAssert( transformLoc[1] = glGetUniformLocation(mProgram, (GLchar*)"projectionMatrix") );
+    glAssert( transformLoc[2] = glGetUniformLocation(mProgram, (GLchar*)"normalMatrix")     );
+    glAssert( transformLoc[3] = glGetUniformLocation(mProgram, (GLchar*)"MVP")              );
+
+    glAssert( glUniformMatrix4fv( transformLoc[0], 1, false, (float*)glm::value_ptr(newViewMatrix)) ) ;
+    glAssert( glUniformMatrix4fv( transformLoc[1], 1, false, (float*)glm::value_ptr(projectionMat)) );
+    glAssert( glUniformMatrix4fv( transformLoc[2], 1, false, (float*)glm::value_ptr(normalTransformMat)));
+    glAssert( glUniformMatrix4fv( transformLoc[3], 1, false, (float*)glm::value_ptr(MVP)));
 
 
 
@@ -498,7 +512,6 @@ public:
         // 1 - Create a VAO. Generate a unique identifier for a VertexArrayObject
         // and store it in this->mVertexArrayObject
         // ( glGenVertexArrays() )
-//        std::cout<<"AAA = "<< this->mVertices <<std::endl;
         glAssert(glGenVertexArrays(1, &(this->mVertexArrayObject)));
 
         // 2 - Create 2 VBOs. Generate two identifiers for VertexBufferObject
@@ -527,15 +540,35 @@ public:
 
         // 6 - Describe the buffer memory layout / organization
         // (glVertexAttribPointer())
-        glAssert(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0));
-        glAssert(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3))));
-        glAssert(glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(glm::vec3)+sizeof(glm::vec3))));
+
+        // FIXED
+
+        GLuint stride = sizeof(Vertex);
+        GLboolean normalized = GL_FALSE;
 
         // Note: You need to tell OpenGL how is organized your data.
         // for instance associate
         // - position      -> (index 0)
         // - normal        -> (index 1)
         // - texture coord -> (index 2)
+
+        // position
+        GLuint index = 0;
+        GLint size = 3;
+        GLvoid* ptr = 0;
+        glAssert( glVertexAttribPointer(index, size, GL_FLOAT, normalized, stride, ptr) );
+
+        // normal
+        index = 1;
+        size = 3;
+        ptr = (void*)sizeof(glm::vec3);
+        glAssert( glVertexAttribPointer(index, size, GL_FLOAT, normalized, stride, ptr) );
+
+        // texture coordinates
+        index = 2;
+        size = 2;
+        ptr = (void*)(2*sizeof(glm::vec3));
+        glAssert( glVertexAttribPointer(index, size, GL_FLOAT, normalized, stride, ptr) );
 
         // 7 - Enable which attributes are to be used (position, normal, etc.)
         // (glEnableVertexAttribArray)
@@ -551,8 +584,10 @@ public:
 
         // 9 - Fill VertexBufferObject *of faces*
         // ...
-//        std::cout<<sizeof(VertexArray)<<std::endl;
-        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mNbTriangles*sizeof(TriangleIndex), &mTriangles[0], GL_STATIC_DRAW));
+        // FIXED?
+        // Point to be noted!
+//        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, mNbTriangles*sizeof(TriangleIndex), &mTriangles[0], GL_STATIC_DRAW));
+        glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*mNbTriangles*sizeof(int), &mTriangles[0], GL_STATIC_DRAW));
 
 
         // LAB 1 / PART II: END CODE TO COMPLETE
@@ -578,7 +613,10 @@ public:
             // 2 - Draw triangles.
             // The vertices of the triangles being indexed and not consecutive (except in very specific cases)
             // we will use the glDrawElements (...) function
-            glAssert(glDrawElements(GL_TRIANGLES, mNbTriangles*sizeof(TriangleIndex), GL_UNSIGNED_INT, 0));
+
+        // FIXED
+//            glAssert(glDrawElements(GL_TRIANGLES, mNbTriangles*sizeof(TriangleIndex), GL_UNSIGNED_INT, 0));
+            glAssert(glDrawElements(GL_TRIANGLES, 3*mNbTriangles*sizeof(int), GL_UNSIGNED_INT, 0));
 
         // Watch out! The "count" parameter of glDrawElements() does not define
         // the number of triangles but the actual size your index buffer.
@@ -597,9 +635,11 @@ public:
 
         // 1 - delete VBO and VBE
         // glDeleteBuffers()
-
+        glAssert( glDeleteBuffers(2, mVertexBufferObjects) );
         // 2 - Delete VAO
         // glDeleteVertexArrays()
+        glAssert( glDeleteVertexArrays(1, &mVertexArrayObject) );
+
 
 
         // LAB 1 / PART II: END CODE TO COMPLETE
@@ -632,7 +672,7 @@ void Renderer::initGeometry()
     // A parser is already available all is asked here is to explore this very
     // project's code and find what you need.
 
-    // 1 - Build a vector of meshes (std::vector<loaders::Mesh*>)
+    // 1 - Build a vector of meshes (std::vector<Loaders::Mesh*>)
     // from the file "../data/camel.obj"
     // You need to create a "loaders::obj_mtl::ObjLoader".
     // and use the method ".load()" to parse an "camel.obj".
@@ -641,23 +681,36 @@ void Renderer::initGeometry()
     std::vector <Loaders::Mesh*> meshes;
     Loaders::Obj_mtl::ObjLoader loader;
     QString err = "File not found!";
-    loader.load("../data/camel.obj", err);
+    bool obj_loaded = loader.load("../data/camel.obj", err);
+
+    if (!obj_loaded)
+    {
+        std::cerr<<"Object not loaded!"<<std::endl;
+        return;
+    }
     loader.getObjects(meshes);
 
     // 2 - Convert the list of meshes to "MyGLMesh"
     // (use this->mMeshes to store the converted objects)
 
-    std::vector<MyGLMesh*> MM(meshes.size());
-    for (unsigned int i = 0; i < meshes.size(); i++) {
-        MM[i] = (RenderSystem::MyGLMesh*)(meshes[i]);
-    }
-    this->mMeshes = MM;
+    // FIXED!
 
-    // 3 - Upload to GPU with ".compileGL()"
-    for (std::vector<MyGLMesh*>::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it) {
-        (*it)->compileGL();
+    for (Loaders::Mesh* ptr : meshes) {
+        MyGLMesh* newObject = new MyGLMesh(*ptr);
+        newObject -> compileGL();
+        mMeshes.push_back(newObject);
     }
 
+//    std::vector<MyGLMesh*> MM(meshes.size());
+//    for (unsigned int i = 0; i < meshes.size(); i++) {
+//        MM[i] = (RenderSystem::MyGLMesh*)(meshes[i]);
+//    }
+//    this->mMeshes = MM;
+
+    // 3 - Upload to GPU with ".compileGL()" - DONE ABOVE
+//    for (std::vector<MyGLMesh*>::iterator it = mMeshes.begin(); it != mMeshes.end(); ++it) {
+//        (*it)->compileGL();
+//    }
     // LAB 1 / PART II: END CODE TO COMPLETE
     // #########################################################################
 }
