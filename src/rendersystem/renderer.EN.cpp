@@ -774,7 +774,7 @@ int Renderer::handleMouseEvent(const MouseEvent& event)
 
         glm::vec3 right = glm::vec3(invViewMat[0][0], invViewMat[0][1], invViewMat[0][2]);
         glm::vec3 up = glm::vec3(invViewMat[1][0], invViewMat[1][1], invViewMat[1][2]);
-        glm::vec3 position = glm::vec3(invViewMat[2][0], invViewMat[2][1], invViewMat[2][2]);
+//        glm::vec3 position = glm::vec3(invViewMat[2][0], invViewMat[2][1], invViewMat[2][2]);
 
         // Note: The frame of the camera is i, j, k encoded into the
         // this->mViewMatrix, Find by yourself you to extract i, j, k from this
