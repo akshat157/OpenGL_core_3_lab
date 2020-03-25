@@ -809,9 +809,10 @@ int Renderer::handleMouseEvent(const MouseEvent& event)
             this->mViewMatrix = glm::translate(this->mViewMatrix, xvec+yvec);
         } break;
         case MouseEvent::MIDDLE: {
+            GLfloat speed = 5.0f;
             // 1 - Compute the translation vector zvec according to the camera Z axis
             glm::vec3 direction = glm::vec3(this->mViewMatrix[0][2], this->mViewMatrix[1][2], this->mViewMatrix[2][2]);
-            glm::vec3 zvec = direction * dy;    // Moving the mouse up and down governs how much to zoom in or zoom out.
+            glm::vec3 zvec = direction * dy * speed;    // Moving the mouse up and down governs how much to zoom in or zoom out.
             // 2 - Modify mViewMatrix to translate about zvec
             this->mViewMatrix = glm::translate(this->mViewMatrix, zvec);
 
